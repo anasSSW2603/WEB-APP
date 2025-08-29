@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exercise 04</title>
+</head>
+<body>
+    <div id="maincontainer"></div>
+
+    <script>
+        // สร้าง heading
+        let heading = document.createElement("h2");
+        heading.innerText = "Exercise 04: Javascript & DOM";
+        document.getElementById("maincontainer").appendChild(heading);
+
+        // สร้าง container ห่อปุ่มกับ personal info
+        let container = document.createElement("div");
+        document.getElementById("maincontainer").appendChild(container);
+
+        // สร้างปุ่ม
+        let button = document.createElement("button");
+        button.innerText = "Click me to display Date and Time";
+        container.appendChild(button);
+
+        // สร้าง block สำหรับ personal info ให้ขึ้นบรรทัดใหม่
+        let personalBlock = document.createElement("div");
+        personalBlock.style.marginTop = "10px"; // เว้นระยะจากปุ่ม
+        container.appendChild(personalBlock);
+
+        // สร้าง span สำหรับ hover
+        let paragragh = document.createElement("span");
+        paragragh.innerText = "personal info";
+        paragragh.style.cursor = "pointer";
+        paragragh.style.display = "inline-block"; // hover เฉพาะข้อความ
+        paragragh.style.padding = "2px 5px";
+        personalBlock.appendChild(paragragh);
+
+        // สร้าง p สำหรับข้อมูล
+        let info = document.createElement("p");
+        info.innerText = "Anas Sriruwan ID: 67015167\nSubject: WEB application development\nSemester: 1";
+        info.style.whiteSpace = "pre";
+        info.style.display = "none";
+        personalBlock.appendChild(info);
+
+        // hover effect
+        paragragh.onmouseenter = () => {
+            paragragh.style.backgroundColor = "yellow";
+            paragragh.style.color = "blue";
+            paragragh.style.textDecoration = "underline";
+        };
+        paragragh.onmouseleave = () => {
+            paragragh.style.backgroundColor = "";
+            paragragh.style.color = "";
+            paragragh.style.textDecoration = "";
+        };
+
+        // click เพื่อแสดง/ซ่อน
+        paragragh.onclick = () => {
+            info.style.display = (info.style.display === "none") ? "block" : "none";
+        };
+
+        // ----------------- เวลา -----------------
+        // สร้าง div สำหรับแสดงเวลา (fixed)
+        let timeDiv = document.createElement("div");
+        timeDiv.style.position = "fixed";
+        timeDiv.style.top = "10px";
+        timeDiv.style.right = "10px";
+        timeDiv.style.padding = "5px 10px";
+        timeDiv.style.cursor = "pointer";
+        timeDiv.style.display = "none";
+        document.body.appendChild(timeDiv);
+
+        // สร้าง Worker
+        let worker = new Worker('worker.js');
+        worker.onmessage = function(e){
+            timeDiv.innerText = e.data.time;
+            timeDiv.style.backgroundColor = e.data.color;
+        }
+
+        let showingTime = false;
+        let movedToButton = false;
+        let buttonRect;
+
+        // กดปุ่มเพื่อแสดงเวลา
+        button.onclick = () => {
+            buttonRect = button.getBoundingClientRect();
+            button.style.visibility = 'hidden';
+            timeDiv.style.display = 'block';
+            worker.postMessage('start');
+            showingTime = true;
+            movedToButton = false;
+        };
+
+        // กดที่เวลา
+        timeDiv.onclick = () => {
+            if(showingTime){
+                if(!movedToButton){
+                    timeDiv.style.top = buttonRect.top + "px";
+                    timeDiv.style.left = buttonRect.left + "px";
+                    timeDiv.style.right = "auto";
+                    worker.postMessage('stop');
+                    movedToButton = true;
+                } else {
+                    timeDiv.style.top = "10px";
+                    timeDiv.style.right = "10px";
+                    timeDiv.style.left = "auto";
+                    worker.postMessage('start');
+                    movedToButton = false;
+                }
+            }
+        };
+
+        let heading1 = document.createElement("h1");
+        heading1.innerText = "Sanpshots";
+        document.getElementById("maincontainer").appendChild(heading1);
+    </script>
+</body>
+</html>
